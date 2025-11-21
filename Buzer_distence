@@ -1,0 +1,40 @@
+#define TRIG 9
+#define ECHO 10
+#define BUZZER 8
+
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  pinMode(BUZZER, OUTPUT);
+
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  // Trigger pulse
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+
+  // Read echo
+  long duration = pulseIn(ECHO, HIGH);
+
+  // Convert to cm
+  float distance = duration * 0.034 / 2;
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Buzzer ON if object < 20 cm
+  if (distance > 0 && distance < 20) {
+    digitalWrite(BUZZER, HIGH);
+  } else {
+    digitalWrite(BUZZER, LOW);
+  }
+
+  delay(200);
+}
