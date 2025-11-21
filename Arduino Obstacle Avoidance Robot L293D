@@ -1,0 +1,105 @@
+// ==== Pin Definitions ====
+#define TRIG 9
+#define ECHO 10
+
+#define IN1 2   // Left motor
+#define IN2 3
+#define IN3 4   // Right motor
+#define IN4 5
+
+long distance;
+
+// ==== Movement Functions ====
+void forward() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void backward() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+void leftTurn() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
+void rightTurn() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+}
+
+void stopMotor() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+// ==== Ultrasonic Distance Function ====
+long getDistance() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+
+  long duration = pulseIn(ECHO, HIGH);
+  return (duration * 0.034 / 2);
+}
+
+// ==== Setup ====
+void setup() {
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+
+  Serial.begin(9600);
+}
+
+// ==== Main Logic ====
+void loop() {
+
+  distance = getDistance();
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  if (distance > 20 || distance == 0) {
+    // clear path → move forward
+    forward();
+  }
+  else {
+    // obstacle detected
+    stopMotor();
+    delay(200);
+
+    backward();
+    delay(300);
+
+    stopMotor();
+    delay(200);
+
+    rightTurn();   // or leftTurn();
+    delay(400);
+
+    stopMotor();
+    delay(200);
+  }
+
+  delay(100);
+}
